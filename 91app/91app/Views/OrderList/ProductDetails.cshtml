@@ -1,0 +1,9 @@
+﻿@model Products
+@{
+    ViewData["Title"] = "商品詳細資料";
+    var product = this.Model;
+}
+
+<h1>@product.ProductName 的詳細資料</h1>
+<p>Price: @product.Price</p>
+<p>Cost: @product.Cost</p>

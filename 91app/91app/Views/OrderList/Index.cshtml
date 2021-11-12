@@ -1,0 +1,89 @@
+﻿@{
+    ViewData["Title"] = "Order查詢";
+}
+
+<legend>Order查詢</legend>
+
+<div id="result">
+        <h3>@User.Identity.Name 的查詢結果:</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Order Id</th>
+                    <th>Order Item</th>
+                    <th>Price</th>
+                    <th>Cost</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody >
+                <tr v-for="order in List" >
+                    <td>
+                        <input type="checkbox" v-on:change="Checked(order.orderId)"/>
+                    </td>
+                    <td>{{order.orderId}}</td>
+                    <td>
+                        <a :href="'/OrderList/ProductDetails/'+order.orderItem">{{order.orderItem}}</a>
+                    </td>
+                    <td>{{order.price}}</td>
+                    <td>{{order.cost}}</td>
+                    <td>{{order.status}}</td>
+            </tbody>
+        </table>
+        <button type="button" v-on:click="Confirm" class="btn btn-primary">Confirm</button>
+    </div>
+
+
+<script>
+
+    var app = new Vue({
+        el: '#result',
+        data: {
+            List: ""
+        },
+        created: function() {
+            var self = this;
+            $.ajax({
+                url:"/OrderList/GetList",
+                type:"post",
+                async: false,
+                success:function(n){
+                    if (n != null) {
+                        self.List = n;
+                    } 
+                }
+            })
+        },
+        methods: {
+            Checked:function(id) {
+                var list = this.List;
+                for (var i = 0; i < list.length; i++) {
+                    if (list[i].orderId === id && list[i].confirmed == false) {
+                        list[i].confirmed = true;
+                    } else if (list[i].orderId === id && list[i].confirmed == true) 
+                    {
+                        list[i].confirmed = false;
+                    }
+                }
+            },
+            Confirm:function() {
+                var self = this;
+                $.ajax({
+                    url:"/OrderList/Confirm",
+                    type:"post",
+                    async: false,
+                    data: { ConfirmedList : self.List },
+                    success:function(n){
+                        if (n) {
+                            location.reload();
+                        } else {
+                            alert("錯誤!");
+                        }
+                    }
+                })
+            }
+        }
+    })
+</script>
+
